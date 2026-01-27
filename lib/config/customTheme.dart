@@ -6,7 +6,7 @@ ThemeData darkmode = ThemeData(useMaterial3: true, brightness: Brightness.dark);
 ThemeData lightmode = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-  scaffoldBackgroundColor: AppColors.background,
+  // scaffoldBackgroundColor: AppColors.background,
 );
 
 const String apiKey =

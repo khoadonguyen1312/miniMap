@@ -17,3 +17,7 @@ Future<geo.Position> getCurrentDevicePos() async {
     desiredAccuracy: geo.LocationAccuracy.high,
   );
 }
+
+String meterToKmText(double meter) {
+  return (meter / 1000).toStringAsFixed(2);
+}

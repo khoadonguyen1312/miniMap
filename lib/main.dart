@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:minimap/componnent/customIconButton.dart';
+import 'package:minimap/componnent/custom_Search_Delege.dart';
 import 'package:minimap/config/customTheme.dart';
 import 'package:minimap/config/env.dart';
 import 'package:minimap/provider/mapProvider.dart';
@@ -10,6 +14,7 @@ import "package:geolocator/geolocator.dart" as geo;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MapboxOptions.setAccessToken(apiKey);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(AppMultiProvider());
 }
 
@@ -75,46 +80,61 @@ class _AppState extends State<App> {
     return MaterialApp(
       theme: lightmode,
       home: Scaffold(
-        floatingActionButton: TextButton(
-          onPressed: () async {
-            geo.Position postion = await getCurrentDevicePos();
-            Provider.of<MapProvider>(context, listen: false).mapboxMap?.flyTo(
-              CameraOptions(
-                center: Point(
-                  coordinates: Position(postion.longitude, postion.latitude),
-                ),
-              ),
-              MapAnimationOptions(),
-            );
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          actions: [
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(CupertinoIcons.search),
+                  onPressed: () {
+                    showSearch(
+                      context: context,
+                      delegate: CustomSearchDelege(),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        floatingActionButton: CustomIconButton(
+          onPressed: () {
+            Provider.of(context, listen: false);
           },
-          child: Text("test"),
+          icon: Icon(Icons.location_on),
         ),
         body: Consumer<MapProvider>(
           builder: (context, value, child) {
-            return MapWidget(
-              onMapCreated: (controller) async {
-                Provider.of<MapProvider>(
-                  context,
-                  listen: false,
-                ).initMapController(controller);
-                await controller.location.updateSettings(
-                  LocationComponentSettings(
-                    enabled: true,
-                    pulsingEnabled: true,
+            return Stack(
+              children: [
+                MapWidget(
+                  onMapCreated: (controller) async {
+                    Provider.of<MapProvider>(
+                      context,
+                      listen: false,
+                    ).initMapController(controller);
+                    await controller.location.updateSettings(
+                      LocationComponentSettings(
+                        enabled: true,
+                        pulsingEnabled: true,
+                      ),
+                    );
+                  },
+                  // androidHostingMode: AndroidPlatformViewHostingMode.VD,
+                  cameraOptions: CameraOptions(
+                    zoom: 16,
+                    center: Point(
+                      coordinates: Position(
+                        value.position!.longitude,
+                        value.position!.latitude,
+                      ),
+                    ),
                   ),
-                );
-              },
-              // androidHostingMode: AndroidPlatformViewHostingMode.VD,
-              cameraOptions: CameraOptions(
-                zoom: 16,
-                center: Point(
-                  coordinates: Position(
-                    value.position!.longitude,
-                    value.position!.latitude,
-                  ),
+                  // viewport: context.watch<MapProvider>().viewport,
                 ),
-              ),
-              // viewport: context.watch<MapProvider>().viewport,
+              ],
             );
           },
         ),
