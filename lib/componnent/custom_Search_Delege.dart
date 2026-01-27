@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+
 import 'package:minimap/api/search.dart';
 import 'package:minimap/model/search_models.dart';
 import 'package:minimap/provider/mapProvider.dart';
@@ -30,10 +30,11 @@ class CustomSearchDelege extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     final provider = Provider.of<MapProvider>(context, listen: false);
     print(provider.access_token);
+    provider.sSession(Uuid().v4());
     return FutureBuilder(
       future: searchApi(
         provider.position!,
-        Uuid().v4(),
+        provider.session!,
         provider.access_token,
         10,
         query,

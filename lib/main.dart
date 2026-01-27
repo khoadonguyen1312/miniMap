@@ -101,7 +101,7 @@ class _AppState extends State<App> {
         ),
         floatingActionButton: CustomIconButton(
           onPressed: () {
-            Provider.of(context, listen: false);
+            print(Env.mapboxkey);
           },
           icon: Icon(Icons.location_on),
         ),
