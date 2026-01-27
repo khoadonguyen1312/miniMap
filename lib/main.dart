@@ -13,7 +13,7 @@ import "package:geolocator/geolocator.dart" as geo;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  MapboxOptions.setAccessToken(apiKey);
+  MapboxOptions.setAccessToken(Env.mapboxkey);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(AppMultiProvider());
 }
