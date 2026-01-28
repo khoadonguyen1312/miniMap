@@ -10,6 +10,7 @@ import 'package:minimap/provider/mapProvider.dart';
 import 'package:minimap/util.dart';
 import 'package:provider/provider.dart';
 import "package:geolocator/geolocator.dart" as geo;
+import 'dart:ui' as ui;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,6 +100,9 @@ class _AppState extends State<App> {
             ),
           ],
         ),
+        // floatingActionButton: Image.asset(
+        //   "assets/images/location_icon-removebg-preview.png",
+        // ),
         floatingActionButton: CustomIconButton(
           onPressed: () {
             print(Env.mapboxkey);
@@ -121,7 +125,29 @@ class _AppState extends State<App> {
                         pulsingEnabled: true,
                       ),
                     );
+                    Provider.of<MapProvider>(
+                      context,
+                      listen: false,
+                    ).initPointManager();
                   },
+                  // onStyleLoadedListener: (styleLoadedEventData) async {
+                  //   final icon_location = await loadAssetToMbxImage(
+                  //     'assets/images/location_icon.png',
+                  //   );
+                  //   final provider = Provider.of<MapProvider>(
+                  //     context,
+                  //     listen: false,
+                  //   );
+                  //   await provider.mapboxMap!.style.addStyleImage(
+                  //     "location",
+                  //     1,
+                  //     icon_location,
+                  //     true,
+                  //     [],
+                  //     [],
+                  //     null,
+                  //   );
+                  // },
                   // androidHostingMode: AndroidPlatformViewHostingMode.VD,
                   cameraOptions: CameraOptions(
                     zoom: 16,
@@ -132,6 +158,7 @@ class _AppState extends State<App> {
                       ),
                     ),
                   ),
+
                   // viewport: context.watch<MapProvider>().viewport,
                 ),
               ],

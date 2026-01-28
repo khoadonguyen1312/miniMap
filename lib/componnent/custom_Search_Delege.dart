@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:minimap/api/info.dart';
 
 import 'package:minimap/api/search.dart';
 import 'package:minimap/model/search_models.dart';
@@ -72,7 +73,59 @@ class CustomSearchDelege extends SearchDelegate {
                     showModalBottomSheet(
                       context: context,
                       builder: (context) {
-                        return Container();
+                        return Container(
+                          height: 120,
+                          width: double.infinity,
+                          child: FutureBuilder(
+                            future: info(
+                              data.suggestions[index].mapboxId,
+                              provider.session!,
+                            ),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Container(
+                                  child: Center(child: Text("loading")),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Container(child: Text("error"));
+                              } else {
+                                final provider = Provider.of<MapProvider>(
+                                  context,
+                                  listen: false,
+                                );
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  context.read<MapProvider>().drawPoint(
+                                    snapshot
+                                        .data!
+                                        .features
+                                        .first
+                                        .geometry
+                                        .coordinates
+                                        .first,
+                                    snapshot
+                                        .data!
+                                        .features
+                                        .first
+                                        .geometry
+                                        .coordinates
+                                        .last,
+                                    snapshot
+                                            .data!
+                                            .features
+                                            .first
+                                            .properties
+                                            .name ??
+                                        "none",
+                                  );
+                                });
+                                return Container(child: Text("done"));
+                              }
+                            },
+                          ),
+                        );
                       },
                     );
                   });
@@ -118,7 +171,10 @@ class _CustomListtileResultState extends State<_CustomListtileResult> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.location_on_outlined),
-            Text("${meterToKmText(widget.data.distance!.toDouble())} km"),
+            if (widget.data.distance != null)
+              Text(
+                "${meterToKmText(widget.data.distance!.toDouble() ?? 0)} km",
+              ),
           ],
         ),
         title: Text(widget.data.name),

@@ -2,6 +2,7 @@ import "dart:convert";
 
 import "package:geolocator/geolocator.dart" as geo;
 import "package:http/http.dart" as http;
+import "package:minimap/config/env.dart";
 import "package:minimap/model/search_models.dart";
 
 Future<SearchResponse> searchApi(
@@ -30,7 +31,7 @@ Future<SearchResponse> searchApi(
         "${postion.latitude + 0.15}"
         // "&poi_category=ev_charging"
         "&country=VN"
-        "&access_token=pk.eyJ1Ijoia2hvYWRvbmd1eWVuMTMxMiIsImEiOiJjbWtmMjc3dmkwZXRlM2NxMDAwcWx4cGNsIn0.m9NTBqb9YzxcuLHVZ4LaEw";
+        "&access_token=${Env.mapboxkey}";
     print(url);
     final response = await http.get(Uri.parse(url));
 

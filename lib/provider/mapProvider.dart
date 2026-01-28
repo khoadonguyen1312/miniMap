@@ -13,13 +13,24 @@ class MapProvider extends ChangeNotifier {
   CameraOptions? cameraOptions;
   MapboxMap? mapboxMap;
   geo.Position? position;
-
+  String? session;
   String access_token = Env.mapboxkey;
+  PointAnnotationManager? _pointManager;
 
   /// Init map state + user position
   void initMapController(MapboxMap mapboxmap) {
     this.mapboxMap = mapboxmap;
     notifyListeners();
+  }
+
+  Future<void> initPointManager() async {
+    if (mapboxMap == null) return;
+    _pointManager ??= await mapboxMap!.annotations
+        .createPointAnnotationManager();
+  }
+
+  void sSession(String session) {
+    this.session = session;
   }
 
   void setPost(geo.Position postion) {
@@ -50,5 +61,41 @@ class MapProvider extends ChangeNotifier {
       ),
       MapAnimationOptions(duration: 2),
     );
+  }
+
+  Future<void> drawPoint(double longtite, double latite, String title) async {
+    print("draw----");
+    print(longtite);
+    print(latite);
+    print("end");
+    final _pointManager = this._pointManager;
+    if (_pointManager != null) {
+      await _pointManager.deleteAll();
+      await _pointManager!.create(
+        PointAnnotationOptions(
+          geometry: Point(coordinates: Position(longtite, latite)),
+          iconImage: 'marker-15',
+
+          iconSize: 0.7,
+
+          // text
+          textField: title,
+          textSize: 11,
+          textColor: Colors.black.value,
+          textHaloColor: Colors.white.value,
+          textHaloWidth: 1,
+
+          // position
+          textOffset: [0, 1.2],
+          textAnchor: TextAnchor.TOP,
+        ),
+      );
+      mapboxMap!.flyTo(
+        CameraOptions(center: Point(coordinates: Position(longtite, latite))),
+        MapAnimationOptions(duration: 2),
+      );
+    } else {
+      return;
+    }
   }
 }

@@ -1,4 +1,8 @@
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import "dart:ui" as ui;
+
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 Future<geo.Position> getCurrentDevicePos() async {
   bool isServiceEnable = await geo.Geolocator.isLocationServiceEnabled();
@@ -20,4 +24,35 @@ Future<geo.Position> getCurrentDevicePos() async {
 
 String meterToKmText(double meter) {
   return (meter / 1000).toStringAsFixed(2);
+}
+
+Future<ui.Image> loadUiImage(String assetPath) async {
+  final data = await rootBundle.load(assetPath);
+  final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+  final frame = await codec.getNextFrame();
+  return frame.image;
+}
+
+Future<Uint8List> imagePathToUint8List(String assetPath) async {
+  final byteData = await rootBundle.load(assetPath);
+  return byteData.buffer.asUint8List();
+}
+
+Future<MbxImage> loadAssetToMbxImage(String assetPath) async {
+  // load asset
+  final data = await rootBundle.load(assetPath);
+
+  // decode image
+  final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+  final frame = await codec.getNextFrame();
+  final ui.Image image = frame.image;
+
+  // get raw RGBA bytes
+  final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+
+  return MbxImage(
+    width: image.width,
+    height: image.height,
+    data: byteData!.buffer.asUint8List(),
+  );
 }
