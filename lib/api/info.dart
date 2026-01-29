@@ -7,7 +7,7 @@ import 'package:minimap/model/mapbox_feature_collection.dart';
 Future<FeatureCollection> info(String mapboxid, String session) async {
   try {
     final String url =
-        "https://api.mapbox.com/search/searchbox/v1/retrieve/${mapboxid}?session_token=${session}&access_token=${Env.mapboxkey}";
+        "https://api.mapbox.com/search/searchbox/v1/retrieve/${mapboxid}?session_token=${session}&access_token=${Env.mapboxkey}&language=vi";
     print(url);
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {

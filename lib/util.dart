@@ -56,3 +56,12 @@ Future<MbxImage> loadAssetToMbxImage(String assetPath) async {
     data: byteData!.buffer.asUint8List(),
   );
 }
+
+List<Position> convertToPositions(List<dynamic> coordinates) {
+  return coordinates.map<Position>((c) {
+    return Position(
+      c[0], // lng
+      c[1], // lat
+    );
+  }).toList();
+}

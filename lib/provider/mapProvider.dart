@@ -16,11 +16,70 @@ class MapProvider extends ChangeNotifier {
   String? session;
   String access_token = Env.mapboxkey;
   PointAnnotationManager? _pointManager;
+  late bool drivingmode = false;
 
-  /// Init map state + user position
+  PolylineAnnotationManager? _polylineAnnotationManager;
+
+  Future<void> drawRoute(List<Position> positions) async {
+    drivingmode = true;
+    print("bắt đầu vẽ route");
+    if (_polylineAnnotationManager != null) {
+      await _polylineAnnotationManager!.deleteAll();
+
+      await _polylineAnnotationManager!.create(
+        PolylineAnnotationOptions(
+          geometry: LineString(coordinates: positions),
+          lineColor: Colors.blue.value,
+          lineWidth: 6,
+          lineJoin: LineJoin.ROUND,
+        ),
+      );
+    } else {
+      print("không vẽ được route");
+      return;
+    }
+  }
+
+  Future<void> startDriving() async {
+    print("bắt đầu lái - góc nhìn thứ 3");
+    drivingmode = true;
+
+    await mapboxMap!.location.updateSettings(
+      LocationComponentSettings(
+        enabled: true,
+        pulsingEnabled: true,
+        puckBearingEnabled: true,
+      ),
+    );
+
+    final position = await getCurrentDevicePos();
+    if (position != null) {
+      await mapboxMap!.flyTo(
+        CameraOptions(
+          center: Point(
+            coordinates: Position(position.longitude, position.latitude),
+          ),
+          zoom: 18,
+          pitch: 60,
+          bearing: 0,
+        ),
+        MapAnimationOptions(duration: 1000),
+      );
+    }
+
+    notifyListeners();
+  }
+
   void initMapController(MapboxMap mapboxmap) {
     this.mapboxMap = mapboxmap;
+
     notifyListeners();
+  }
+
+  void initPolyline() async {
+    if (mapboxMap == null) return;
+    _polylineAnnotationManager ??= await mapboxMap!.annotations
+        .createPolylineAnnotationManager();
   }
 
   Future<void> initPointManager() async {
@@ -91,8 +150,11 @@ class MapProvider extends ChangeNotifier {
         ),
       );
       mapboxMap!.flyTo(
-        CameraOptions(center: Point(coordinates: Position(longtite, latite))),
-        MapAnimationOptions(duration: 2),
+        CameraOptions(
+          zoom: 17,
+          center: Point(coordinates: Position(longtite, latite)),
+        ),
+        MapAnimationOptions(duration: 3),
       );
     } else {
       return;

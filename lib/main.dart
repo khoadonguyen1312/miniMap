@@ -81,6 +81,34 @@ class _AppState extends State<App> {
     return MaterialApp(
       theme: lightmode,
       home: Scaffold(
+        drawer: Drawer(
+          child: Container(
+            child: ListView(
+              children: [
+                Text(
+                  "Danh sách thành viên",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                ListTile(
+                  title: Text("Nguyễn Quốc Tuấn"),
+                  subtitle: Text("mssv :080205001558"),
+                ),
+                ListTile(
+                  title: Text("Nguyễn Ngọc Tuấn"),
+                  subtitle: Text("mssv :089205007334"),
+                ),
+                ListTile(
+                  title: Text("Huỳnh Tú Đô"),
+                  subtitle: Text("mssv :052205003993"),
+                ),
+                ListTile(
+                  title: Text("Đỗ Nguyễn Việt Khoa"),
+                  subtitle: Text("mssv :080205003377"),
+                ),
+              ],
+            ),
+          ),
+        ),
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -103,12 +131,18 @@ class _AppState extends State<App> {
         // floatingActionButton: Image.asset(
         //   "assets/images/location_icon-removebg-preview.png",
         // ),
-        floatingActionButton: CustomIconButton(
-          onPressed: () {
-            print(Env.mapboxkey);
-          },
-          icon: Icon(Icons.location_on),
-        ),
+        floatingActionButton:
+            Provider.of<MapProvider>(context, listen: true).drivingmode
+            ? TextButton(
+                onPressed: () async {
+                  await Provider.of<MapProvider>(
+                    context,
+                    listen: false,
+                  ).startDriving();
+                },
+                child: Text("Bắt Đầu"),
+              )
+            : null,
         body: Consumer<MapProvider>(
           builder: (context, value, child) {
             return Stack(
@@ -129,6 +163,13 @@ class _AppState extends State<App> {
                       context,
                       listen: false,
                     ).initPointManager();
+                  },
+
+                  onStyleLoadedListener: (styleLoadedEventData) {
+                    Provider.of<MapProvider>(
+                      context,
+                      listen: false,
+                    ).initPolyline();
                   },
                   // onStyleLoadedListener: (styleLoadedEventData) async {
                   //   final icon_location = await loadAssetToMbxImage(
